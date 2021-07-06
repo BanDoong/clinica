@@ -238,15 +238,15 @@ def adni1go2_image(
     filtered_mprage = preferred_processed_scan(mprage_meta_subj, visit_str)
 
     # If no N3 processed image found (it means there are no processed images at all), get best original image
-    if filtered_mprage.empty:
-        return original_image(
-            subject_id,
-            timepoint,
-            visit_str,
-            mprage_meta_subj,
-            mayo_mri_qc_subj,
-            preferred_field_strength,
-        )
+    # if filtered_mprage.empty:
+    #     return original_image(
+    #         subject_id,
+    #         timepoint,
+    #         visit_str,
+    #         mprage_meta_subj,
+    #         mayo_mri_qc_subj,
+    #         preferred_field_strength,
+    #     )
 
     # If there are images with different magnetic field strength, prefer 1.5T images for ADNI1, 3.0T otherwise
     if len(filtered_mprage.MagStrength.unique()) > 1:
@@ -263,19 +263,14 @@ def adni1go2_image(
     sequence = scan.Sequence[: n3 + 2 + int(scan.Sequence[n3 + 2] == "m")]
     sequence = replace_sequence_chars(sequence)
 
-    return {
-        "Subject_ID": subject_id,
-        "VISCODE": timepoint,
-        "Visit": visit_str,
-        "Sequence": sequence,
-        "Scan_Date": scan.ScanDate,
-        "Study_ID": str(scan.StudyID),
-        "Series_ID": str(scan.SeriesID),
-        "Image_ID": str(scan.ImageUID),
-        "Field_Strength": scan.MagStrength,
-        "Original": False,
-    }
-
+    return original_image(
+        subject_id,
+        timepoint,
+        visit_str,
+        mprage_meta_subj,
+        mayo_mri_qc_subj,
+        preferred_field_strength,
+    )
 
 def preferred_processed_scan(mprage_meta_subj, visit_str, unwanted_series_id=()):
     """Filter content of Dataframe containing MPRAGE metadata to obtain last processed image for the specified visit.
